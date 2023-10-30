@@ -16,8 +16,7 @@ function navigate(state) {
     const button = document.querySelector("#" + path);
     button.addEventListener("click", () => {
       const state = { path };
-      console.log("path: ", path, "state", state.path);
-
+    //   console.log("path: ", path, "state", state.path);
       history.pushState(state, "", path);
       navigate(state);
     });
@@ -31,12 +30,19 @@ window.addEventListener('popstate', (event) => {
 fetch('/src/data/postData.json')
 .then(response => response.json())
 .then(data => {
-    data.map((item, index)=>{
-        const titleElements = document.querySelectorAll('.title')
-        if (index < titleElements.length) {
-            titleElements[index].innerHTML = item.title;
-        }
-    })
+    data.forEach((a, i)=>{
+        console.log(i.name)
+        const lists = document.createElement("div");
+        lists.innerHTML = `
+            <img src="${data[i].src}" />
+            <div class="list_contents">
+                <div id="title">${data[i].title}</div>
+                <div id="desc">${data[i].desc}</div>
+                <div id="date">${data[i].date}</div>
+            </div>
+        `
+    document.querySelector("main").append(lists)
+})
 
 })
 .catch(error => console.error('데이터 가져오기 오류: ', error));
