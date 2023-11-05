@@ -1,10 +1,11 @@
 
 async function fetchHtmlAsText(url) {
-    return await (await fetch(url)).text();
+    return (await fetch(url)).text();
 }
 
 async function importPage(target) {
     document.querySelector("main").innerHTML = await fetchHtmlAsText(target + '.html');
+    console.log(target)
 }
 
 function navigate(state) {
@@ -22,6 +23,7 @@ function navigate(state) {
     });
   }
 );
+
   
 window.addEventListener('popstate', (event) => {
     navigate(event.state)
@@ -32,13 +34,16 @@ fetch('/src/data/postData.json')
 .then(data => {
     data.forEach((a, i)=>{
         console.log(i.name)
+        console.log(window.location.hash)
         const lists = document.createElement("div");
         lists.innerHTML = `
+        <div class="list_contents">
             <img src="${data[i].src}" />
-            <div class="list_contents">
-                <div id="title">${data[i].title}</div>
-                <div id="desc">${data[i].desc}</div>
-                <div id="date">${data[i].date}</div>
+                <div id="contents">
+                    <div id="title">${data[i].title}</div>
+                    <div id="desc">${data[i].desc}</div>
+                    <div id="date">${data[i].date}</div>
+                </div>
             </div>
         `
     document.querySelector("main").append(lists)
@@ -46,3 +51,6 @@ fetch('/src/data/postData.json')
 
 })
 .catch(error => console.error('데이터 가져오기 오류: ', error));
+
+
+
