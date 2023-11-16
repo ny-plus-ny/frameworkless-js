@@ -32,6 +32,8 @@ main {
 .list_contents {
   display: flex;
   gap: 50px;
+  text-decoration: none;
+  color: black;
 }
 
 .list_contents > img {
