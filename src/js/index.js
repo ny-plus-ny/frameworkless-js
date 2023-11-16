@@ -1,11 +1,10 @@
 import homePage from './home.js';
 import postPage from './post.js';
-import designPage from './design.js';
 import notFound from './404.js';
 
 const HEADER = document.getElementById("header")
 const MAIN = document.querySelector("main")
-const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$")
+// const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$")
 
 const routes = [
     {path: "/", component: homePage },
@@ -18,7 +17,7 @@ console.log("index3.js ok")
 
 const router = async path => {
     const _path = path ?? window.location.pathname;
-   console.log("_path is: ",_path)
+    console.log("_path is: ",_path)
     try {
       const component = routes.find(route => route.path === _path)?.component || notFound;
       MAIN.replaceChildren(await component());
@@ -41,7 +40,6 @@ HEADER.addEventListener("click", (e)=>{
     router(pathHref)
 })
 
-const listComponents= document.querySelector(".list_contents")
 
 window.addEventListener('popstate', () => {
     router();
