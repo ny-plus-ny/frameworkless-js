@@ -1,52 +1,68 @@
 import homePage from './home.js';
-import postPage from './post.js';
 import designPage from './design.js';
 import notFound from './404.js';
+import pageHandler from './pageHandler.js';
 
 const HEADER = document.getElementById("header")
 const MAIN = document.querySelector("main")
 
 const routes = [
   {path: "/", component: homePage },
-  {path: "/post/:id", component: postPage },
+  {path: "/post/:id", component: pageHandler },
   {path: "/design", component: designPage },
 ]
 
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$")
 
+const _path = window.location.pathname;
+// const matchedRoute = routes.map(route => {
+//   return _path.match(pathToRegex(route.path))
+// })
+// const notNullRoute =  matchedRoute.find( route => route !== null) 
+
+const objMatchedRoute = routes.map(route => {
+    return {
+      route: route,
+      result: _path.match(pathToRegex(route.path))
+    };
+})
+
+let nopeNullRoute = objMatchedRoute.find(item => item.result !== null)
+
+console.log("objMatchedRoute: ",objMatchedRoute, "nopeNullRoute:", nopeNullRoute)
+const getURL = (url) => {
+    const values = url.result.slice(1)
+    const keys = Array.from(url.route.path.matchAll(/:(\w+)/g)).map(result => result[1])
+
+    return Object.fromEntries(keys.map((key, i) => {
+      return [key, values[i]];
+    }));
+}
+
+
+
 const router = async () => {
-    const _path = window.location.pathname;
-    const matchedRoute = routes.map(route => {
-      return _path.match(pathToRegex(route.path))
-    })
-    const notNullRoute =  matchedRoute.find( route => route !== null) 
-    const componentFunc = (dataId) => {
-      if(dataId) {
-        routes.find(route => route.path === notNullRoute[0])?.component(dataId) || notFound()
+    const componentFunc = () => {
+      const view = nopeNullRoute.route.component(getURL(nopeNullRoute))
+      if(view) {
+        console.log("view", view[1])
+        routes.find(route => route.path === nopeNullRoute.result[0])?.component(view[1]) || notFound()
       } else {
-        routes.find(route => route.path === notNullRoute[0])?.component() || notFound() 
+        routes.find(route => route.path === nopeNullRoute.result[0])?.component() || notFound() 
       }
     };
-    // const render = routes.find(route => route.path === location.pathname)?.component || notFound
+
     const showComponent = async (id) => {
       if (id){
-        console.log("id 있음 ",id)
+        // const view = nopeNullRoute.route.component(getURL(nopeNullRoute))
         MAIN.replaceChildren(await componentFunc(id));
       } else {
-        console.log("id 없음")
         MAIN.replaceChildren(await componentFunc());
       }
     }
-
-  try {
-      console.log("notNullRoute:", notNullRoute)
-      // const component = routes.find(route => route.path === notNullRoute[0])?.component || notFound;      
-      // MAIN.replaceChildren(await showComponent(notNullRoute[1]));
-      if (typeof(notNullRoute[1]) === 'string') {
-        showComponent(notNullRoute[1])
-      } else {
-        showComponent()
-      }
+    
+    try {    
+      MAIN.replaceChildren(await showComponent(nopeNullRoute.result[0]));
     } catch (err) {
       console.error(err);
     }
@@ -69,9 +85,10 @@ HEADER.addEventListener("click", (e)=>{
 
 window.addEventListener('popstate', () => {
     router();
-  });
+});
 
-window.addEventListener('DOMContentLoaded', ()=> {router()
+window.addEventListener('DOMContentLoaded', ()=> {
+    router()
 });
 
 
